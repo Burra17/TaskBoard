@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TaskBoard.Application.Commands.Projects;
+using TaskBoard.Application.Queries.Projects;
 
 namespace TaskBoard.API.Controllers
 {
@@ -23,5 +24,12 @@ namespace TaskBoard.API.Controllers
             return CreatedAtAction(nameof(CreateProject), new { id = result }, result);
         }
 
+        // GET api/projects
+        [HttpGet]
+        public async Task<IActionResult> GetAllProjects()
+        {
+            var result = await _mediator.Send(new GetAllProjectsQuery());
+            return Ok(result);
+        }
     }
 }
