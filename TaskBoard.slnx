@@ -3,6 +3,6 @@
     <Project Path="src/TaskBoard.API/TaskBoard.API.csproj" />
     <Project Path="src/TaskBoard.Application/TaskBoard.Application.csproj" />
     <Project Path="src/TaskBoard.Infrastructure/TaskBoard.Infrastructure.csproj" />
-    <Project Path="TaskBoard.Domain/TaskBoard.Domain.csproj" />
+    <Project Path="src/TaskBoard.Domain/TaskBoard.Domain.csproj" />
   </Folder>
 </Solution>
