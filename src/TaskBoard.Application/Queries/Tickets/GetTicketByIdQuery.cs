@@ -1,6 +1,6 @@
 ﻿using MediatR;
-using TaskBoard.Domain.Models;
+using TaskBoard.Application.DTOs;
 
 namespace TaskBoard.Application.Queries.Tickets;
 
-public record GetTicketByIdQuery(Guid Id) : IRequest<Ticket?>;
+public record GetTicketByIdQuery(Guid Id) : IRequest<TicketDto?>;

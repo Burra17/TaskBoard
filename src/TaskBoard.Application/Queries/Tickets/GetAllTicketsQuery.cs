@@ -1,6 +1,6 @@
 ﻿using MediatR;
-using TaskBoard.Domain.Models;
+using TaskBoard.Application.DTOs;
 
 namespace TaskBoard.Application.Queries.Tickets;
 
-public record GetAllTicketsQuery : IRequest<IEnumerable<Ticket>>;
+public record GetAllTicketsQuery : IRequest<IEnumerable<TicketDto>>;
