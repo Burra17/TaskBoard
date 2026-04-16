@@ -53,4 +53,12 @@ public class TicketsController : ControllerBase
         var result = await _mediator.Send(command with { Id = id });
         return Ok(result);
     }
+
+    // DELETE api/ticket/{id}
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteTicket(Guid id)
+    {
+        await _mediator.Send(new DeleteTicketCommand(id));
+        return NoContent();
+    }
 }
