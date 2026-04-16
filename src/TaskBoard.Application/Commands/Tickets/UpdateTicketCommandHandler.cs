@@ -1,0 +1,34 @@
+﻿using MediatR;
+using TaskBoard.Application.Interfaces;
+using TaskBoard.Domain.Models;
+
+namespace TaskBoard.Application.Commands.Tickets;
+
+public class UpdateTicketCommandHandler : IRequestHandler<UpdateTicketCommand, Ticket>
+{
+    private readonly IRepository<Ticket> _repository;
+
+    public UpdateTicketCommandHandler(IRepository<Ticket> repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<Ticket> Handle(UpdateTicketCommand request, CancellationToken cancellationToken)
+    {
+        var ticket = await _repository.GetByIdAsync(request.Id);
+
+        if (ticket == null)
+            throw new KeyNotFoundException($"Ticket with id {request.Id} not found");
+
+        ticket.Title = request.Title;
+        ticket.Description = request.Description;
+        ticket.Priority = request.Priority;
+        ticket.Status = request.Status;
+        ticket.UpdatedAt = DateTime.UtcNow;
+
+        _repository.Update(ticket);
+        await _repository.SaveChangesAsync();
+
+        return ticket;
+    }
+}
