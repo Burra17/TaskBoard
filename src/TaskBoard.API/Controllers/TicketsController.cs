@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using TaskBoard.Application.Commands.Tickets;
+using TaskBoard.Application.DTOs;
 using TaskBoard.Application.Queries.Projects;
 using TaskBoard.Application.Queries.Tickets;
 
@@ -48,9 +49,11 @@ public class TicketsController : ControllerBase
 
     // PUT api/ticket/{id}
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateTicket(Guid id, UpdateTicketCommand command)
+    public async Task<IActionResult> UpdateTicket(Guid id, UpdateTicketDto dto)
     {
-        var result = await _mediator.Send(command with { Id = id });
+        // Combine URL id with request body into a command
+        var command = new UpdateTicketCommand(id, dto.Title, dto.Description, dto.Priority, dto.Status);
+        var result = await _mediator.Send(command);
         return Ok(result);
     }
 

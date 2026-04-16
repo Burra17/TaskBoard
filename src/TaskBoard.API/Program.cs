@@ -1,6 +1,7 @@
 using Scalar.AspNetCore;
-using TaskBoard.Infrastructure;
+using TaskBoard.API.Middleware;
 using TaskBoard.Application;
+using TaskBoard.Infrastructure;
 
 namespace TaskBoard.API
 {
@@ -11,8 +12,8 @@ namespace TaskBoard.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
+
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
@@ -32,6 +33,8 @@ namespace TaskBoard.API
 
             app.UseAuthorization();
 
+            // Add Middleware for better exeptionhandling
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.MapControllers();
 
