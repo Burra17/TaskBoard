@@ -45,4 +45,12 @@ public class TicketsController : ControllerBase
 
         return Ok(result);
     }
+
+    // PUT api/ticket/{id}
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateTicket(Guid id, UpdateTicketCommand command)
+    {
+        var result = await _mediator.Send(command with { Id = id });
+        return Ok(result);
+    }
 }
