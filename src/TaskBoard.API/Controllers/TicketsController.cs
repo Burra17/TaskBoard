@@ -1,6 +1,9 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using TaskBoard.Application.Commands.Tickets;
+using TaskBoard.Application.Queries.Projects;
+using TaskBoard.Application.Queries.Tickets;
 
 namespace TaskBoard.API.Controllers;
 
@@ -21,5 +24,25 @@ public class TicketsController : ControllerBase
     {
         var result = await _mediator.Send(command);
         return CreatedAtAction(nameof(CreateTicket), new { id = result }, result);
+    }
+
+    // GET api/tickets
+    [HttpGet]
+    public async Task<IActionResult> GetAllTickets()
+    {
+        var result = await _mediator.Send(new GetAllTicketsQuery());
+        return Ok(result);
+    }
+
+    // GET api/ticket/{id}
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetTicketById(Guid id)
+    {
+        var result = await _mediator.Send(new GetTicketByIdQuery(id));
+
+        if (result == null)
+            return NotFound();
+
+        return Ok(result);
     }
 }
