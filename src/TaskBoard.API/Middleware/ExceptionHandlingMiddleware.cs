@@ -35,7 +35,13 @@ public class ExceptionHandlingMiddleware
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsJsonAsync(new { error = ex.Message });
         }
-        catch (Exception ex)
+        catch (UnauthorizedAccessException ex)
+        {
+            context.Response.StatusCode = 401;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsJsonAsync(new { error = ex.Message });
+        }
+        catch (Exception)
         {
             context.Response.StatusCode = 500;
             context.Response.ContentType = "application/json";

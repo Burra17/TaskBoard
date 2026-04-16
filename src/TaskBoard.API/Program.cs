@@ -31,6 +31,7 @@ namespace TaskBoard.API
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             // Add Middleware for better exeptionhandling
