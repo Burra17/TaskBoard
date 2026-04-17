@@ -1,10 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using TaskBoard.Application.Commands.Tickets;
 using TaskBoard.Application.DTOs;
-using TaskBoard.Application.Queries.Projects;
 using TaskBoard.Application.Queries.Tickets;
 
 namespace TaskBoard.API.Controllers;
@@ -26,7 +24,7 @@ public class TicketsController : ControllerBase
     public async Task<IActionResult> CreateTicket(CreateTicketCommand command)
     {
         var result = await _mediator.Send(command);
-        return CreatedAtAction(nameof(CreateTicket), new { id = result }, result);
+        return CreatedAtAction(nameof(GetTicketById), new { id = result }, result);
     }
 
     // GET api/tickets

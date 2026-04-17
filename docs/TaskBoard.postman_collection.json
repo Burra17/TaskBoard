@@ -1,0 +1,297 @@
+{
+  "info": {
+    "_postman_id": "11785fa2-f91c-4d6a-bcb5-3f743576b112",
+    "name": "TaskBoard API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53031698",
+    "_collection_link": "https://go.postman.co/collection/53031698-11785fa2-f91c-4d6a-bcb5-3f743576b112?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\" : \"Admin\",\r\n    \"password\" : \"Admin123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7003/api/auth/login",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7003",
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "  {\r\n    \"username\": \"Admin\",\r\n    \"password\": \"Admin123\"\r\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7003/api/auth/register",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7003",
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Project",
+      "item": [
+        {
+          "name": "Create New Project",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjkwNTAxZTQ1LWMwMWQtNDI0Zi1iNTJlLWFjZWIxOTRmYzdmZiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJBZG1pbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc2NDE4ODg5LCJpc3MiOiJUYXNrQm9hcmQiLCJhdWQiOiJUYXNrQm9hcmQifQ.Sji0SY4tRwHu74uIq6DFNJA8dIExMVy4R_ko3o8JRcM",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"\",\r\n  \"description\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7003/api/projects",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7003",
+              "path": [
+                "api",
+                "projects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Projects",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjZkNDlmZDRlLWFkMzItNGI2Ny1iNTc5LWFmMGIzMmM4NDg1NCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJBbmRyw6kiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJNZW1iZXIiLCJleHAiOjE3NzY0MTg0NDgsImlzcyI6IlRhc2tCb2FyZCIsImF1ZCI6IlRhc2tCb2FyZCJ9.VFxtEsxFOUqYe63cKKYBRoHS4qG8oJH5PnQue5jKuKI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://localhost:7003/api/projects",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7003",
+              "path": [
+                "api",
+                "projects"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Ticket",
+      "item": [
+        {
+          "name": "Get All Tickets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://localhost:7003/api/tickets",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7003",
+              "path": [
+                "api",
+                "tickets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create New Ticket",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"\",\r\n  \"description\": null,\r\n  \"priority\": 1,\r\n  \"projectId\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7003/api/tickets",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7003",
+              "path": [
+                "api",
+                "tickets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Ticket By Id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7003/api/Tickets/?id=",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7003",
+              "path": [
+                "api",
+                "Tickets",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Ticket",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "https://localhost:7003/api/tickets/?id=",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7003",
+              "path": [
+                "api",
+                "tickets",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Ticket",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "https://localhost:7003/api/Tickets/?id=",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7003",
+              "path": [
+                "api",
+                "Tickets",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
