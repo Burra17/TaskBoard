@@ -4,35 +4,34 @@ using Microsoft.AspNetCore.Mvc;
 using TaskBoard.Application.Commands.Projects;
 using TaskBoard.Application.Queries.Projects;
 
-namespace TaskBoard.API.Controllers
+namespace TaskBoard.API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class ProjectsController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProjectsController : ControllerBase
+    private readonly IMediator _mediator;
+
+    public ProjectsController(IMediator mediator)
     {
-        private readonly IMediator _mediator;
+        _mediator = mediator;
+    }
 
-        public ProjectsController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+    // POST api/projects
+    [HttpPost]
+    [Authorize (Roles = "Admin")]
+    public async Task<IActionResult> CreateProject(CreateProjectCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return StatusCode(StatusCodes.Status201Created, result);
+    }
 
-        // POST api/projects
-        [HttpPost]
-        [Authorize (Roles = "Admin")]
-        public async Task<IActionResult> CreateProject(CreateProjectCommand command)
-        {
-            var result = await _mediator.Send(command);
-            return CreatedAtAction(nameof(CreateProject), new { id = result }, result);
-        }
-
-        // GET api/projects
-        [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> GetAllProjects()
-        {
-            var result = await _mediator.Send(new GetAllProjectsQuery());
-            return Ok(result);
-        }
+    // GET api/projects
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> GetAllProjects()
+    {
+        var result = await _mediator.Send(new GetAllProjectsQuery());
+        return Ok(result);
     }
 }

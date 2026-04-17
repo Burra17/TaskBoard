@@ -3,49 +3,31 @@ using TaskBoard.API.Middleware;
 using TaskBoard.Application;
 using TaskBoard.Infrastructure;
 
-namespace TaskBoard.API
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
+
+// OpenAPI with JWT support for Scalar
+builder.Services.AddOpenApi(options =>
+    options.AddDocumentTransformer<SecuritySchemeTransformer>());
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-            builder.Services.AddControllers();
-
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
-
-            builder.Services.AddApplication();
-            builder.Services.AddInfrastructure(builder.Configuration);
-
-            // Adds JWT Bearer authentication scheme to OpenAPI/Scalar documentation
-            builder.Services.AddOpenApi(options =>
-            {
-                options.AddDocumentTransformer<SecuritySchemeTransformer>();
-            });
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.MapOpenApi();
-                app.MapScalarApiReference();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            // Add Middleware for better exeptionhandling
-            app.UseMiddleware<ExceptionHandlingMiddleware>();
-
-            app.MapControllers();
-
-            app.Run();
-        }
-    }
+    app.MapOpenApi();
+    app.MapScalarApiReference();
 }
+
+// Global exception handling
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
