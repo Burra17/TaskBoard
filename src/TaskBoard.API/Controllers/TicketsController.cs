@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using TaskBoard.Application.Commands.Tickets;
@@ -21,6 +22,7 @@ public class TicketsController : ControllerBase
 
     // POST api/tickets
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> CreateTicket(CreateTicketCommand command)
     {
         var result = await _mediator.Send(command);
@@ -29,6 +31,7 @@ public class TicketsController : ControllerBase
 
     // GET api/tickets
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetAllTickets()
     {
         var result = await _mediator.Send(new GetAllTicketsQuery());
@@ -37,6 +40,7 @@ public class TicketsController : ControllerBase
 
     // GET api/ticket/{id}
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<IActionResult> GetTicketById(Guid id)
     {
         var result = await _mediator.Send(new GetTicketByIdQuery(id));
@@ -49,6 +53,7 @@ public class TicketsController : ControllerBase
 
     // PUT api/ticket/{id}
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<IActionResult> UpdateTicket(Guid id, UpdateTicketDto dto)
     {
         // Combine URL id with request body into a command
@@ -59,6 +64,7 @@ public class TicketsController : ControllerBase
 
     // DELETE api/ticket/{id}
     [HttpDelete("{id}")]
+    [Authorize (Roles = "Admin")]
     public async Task<IActionResult> DeleteTicket(Guid id)
     {
         await _mediator.Send(new DeleteTicketCommand(id));

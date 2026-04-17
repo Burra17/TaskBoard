@@ -20,6 +20,12 @@ namespace TaskBoard.API
             builder.Services.AddApplication();
             builder.Services.AddInfrastructure(builder.Configuration);
 
+            // Adds JWT Bearer authentication scheme to OpenAPI/Scalar documentation
+            builder.Services.AddOpenApi(options =>
+            {
+                options.AddDocumentTransformer<SecuritySchemeTransformer>();
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

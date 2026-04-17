@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskBoard.Application.Commands.Projects;
 using TaskBoard.Application.Queries.Projects;
@@ -18,6 +19,7 @@ namespace TaskBoard.API.Controllers
 
         // POST api/projects
         [HttpPost]
+        [Authorize (Roles = "Admin")]
         public async Task<IActionResult> CreateProject(CreateProjectCommand command)
         {
             var result = await _mediator.Send(command);
@@ -26,6 +28,7 @@ namespace TaskBoard.API.Controllers
 
         // GET api/projects
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllProjects()
         {
             var result = await _mediator.Send(new GetAllProjectsQuery());
