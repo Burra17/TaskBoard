@@ -1,7 +1,15 @@
 ﻿namespace TaskBoard.Domain.Common;
 
 // Generic result wrapper for operation outcomes — replaces exception-based error handling
-public class Result<T>
+public interface IResult
+{
+    bool IsSuccess { get; }
+    bool IsError { get; }
+    string? Error { get; }
+    int StatusCode { get; }
+}
+
+public class Result<T> : IResult
 {
     public bool IsSuccess { get; }
     public bool IsError => !IsSuccess;
