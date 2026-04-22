@@ -1,9 +1,14 @@
 using Scalar.AspNetCore;
+using Serilog;
 using TaskBoard.API.Middleware;
 using TaskBoard.Application;
 using TaskBoard.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Serilog
+builder.Host.UseSerilog((context, config) =>
+    config.ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddControllers();
 builder.Services.AddApplication();

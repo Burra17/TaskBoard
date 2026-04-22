@@ -9,6 +9,7 @@ A Clean Architecture ASP.NET Core Web API for managing projects and tickets on a
 - **MediatR** for CQRS (Commands and Queries)
 - **AutoMapper** for entity ↔ DTO mapping
 - **FluentValidation** with a MediatR `ValidationBehavior` pipeline
+- **Serilog** with a MediatR `LoggingBehavior` pipeline
 - **JWT Bearer** authentication (`System.IdentityModel.Tokens.Jwt`)
 - **BCrypt.Net-Next** for password hashing
 - **Scalar** (OpenAPI) for API documentation
@@ -35,6 +36,7 @@ TaskBoard/
 │   ├── TaskBoard.API/
 │   │   ├── Configurations/SecuritySchemeTransformer.cs
 │   │   ├── Controllers/
+│   │   │   ├── ApiController.cs
 │   │   │   ├── AuthController.cs
 │   │   │   ├── ProjectsController.cs
 │   │   │   └── TicketsController.cs
@@ -42,7 +44,9 @@ TaskBoard/
 │   │   ├── Program.cs
 │   │   └── appsettings.json
 │   ├── TaskBoard.Application/
-│   │   ├── Behaviors/ValidationBehavior.cs
+│   │   ├── Behaviors/
+│   │   │   ├── LoggingBehavior.cs
+│   │   │   └── ValidationBehavior.cs
 │   │   ├── Commands/
 │   │   │   ├── Auth/        (Register, Login)
 │   │   │   ├── Projects/    (CreateProject)
@@ -55,6 +59,7 @@ TaskBoard/
 │   │   ├── Mappings/        (AutoMapper profiles)
 │   │   └── DependencyInjection.cs
 │   ├── TaskBoard.Domain/
+│   │   ├── Common/Result.cs
 │   │   ├── Enums/           (Priority, Role, Status)
 │   │   └── Models/          (Project, Ticket, User)
 │   └── TaskBoard.Infrastructure/
@@ -83,10 +88,12 @@ Relationships:
 - **CQRS + MediatR** — every controller action dispatches a Command or Query through `IMediator`. Write and read paths are separated under `Application/Commands` and `Application/Queries`.
 - **Repository Pattern** — generic `IRepository<T>` defined in `Application/Interfaces`, implemented in `Infrastructure/Repositories/Repository.cs` against EF Core.
 - **AutoMapper** — entities never leak out of the API; handlers map to `ProjectDto` / `TicketDto` before returning.
-- **Pipeline Behavior** — `ValidationBehavior<TRequest, TResponse>` runs all registered FluentValidation validators before a handler executes. Failures throw `ValidationException`, which is translated to a 400 by `ExceptionHandlingMiddleware`.
+- **Pipeline Behaviors** — `LoggingBehavior<TRequest, TResponse>` logs every request, its outcome, and elapsed time; `ValidationBehavior<TRequest, TResponse>` runs all registered FluentValidation validators before a handler executes. Validation failures throw `ValidationException`, which is translated to a 400 by `ExceptionHandlingMiddleware`.
+- **Result Pattern** — handlers return `Result<T>` (from `Domain/Common`) with `Ok`, `Fail`, `Created`, and `NoContent` factory methods instead of throwing for expected error paths. The `ApiController` base class maps results to the correct HTTP status via `HandleResult`.
+- **Serilog** — structured logging configured from `appsettings.Development.json` and written to the console. The `LoggingBehavior` pipeline emits an entry per MediatR request with duration and success/error state.
 - **JWT Authentication** — `POST /api/auth/login` returns a signed JWT with `NameIdentifier`, `Name`, and `Role` claims. Protected endpoints use `[Authorize]`.
 - **RBAC** — two roles, `Admin` and `Member`. Admin-only endpoints use `[Authorize(Roles = "Admin")]`.
-- **Exception Handling Middleware** — centralized mapping of `ValidationException` → 400, `KeyNotFoundException` → 404, `UnauthorizedAccessException` → 401, otherwise 500.
+- **Exception Handling Middleware** — centralized fallback for `ValidationException` → 400 and any unhandled exception → 500. Expected error cases (not found, unauthorized, conflicts) are returned as `Result.Fail` from handlers.
 
 ## Prerequisites
 
