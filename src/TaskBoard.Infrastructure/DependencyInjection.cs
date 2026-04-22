@@ -21,6 +21,9 @@ public static class DependencyInjection
         // Repository
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
+        // UoW
+        services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<AppDbContext>());
+
         // JWT Authentication
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>

@@ -8,10 +8,12 @@ namespace TaskBoard.Application.Commands.Projects;
 public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand, Result<Guid>>
 {
     private readonly IRepository<Project> _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateProjectCommandHandler(IRepository<Project> repository)
+    public CreateProjectCommandHandler(IRepository<Project> repository, IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     // Creates a new project and returns its Id
@@ -25,7 +27,7 @@ public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand,
         };
 
         await _repository.AddAsync(project);
-        await _repository.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
         return Result<Guid>.Created(project.Id);
     }

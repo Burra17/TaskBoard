@@ -9,10 +9,12 @@ namespace TaskBoard.Application.Commands.Tickets;
 public class CreateTicketCommandHandler : IRequestHandler<CreateTicketCommand, Result<Guid>>
 {
     private readonly IRepository<Ticket> _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateTicketCommandHandler(IRepository<Ticket> repository)
+    public CreateTicketCommandHandler(IRepository<Ticket> repository, IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     // Creates a new Ticket and returns its Id
@@ -29,7 +31,7 @@ public class CreateTicketCommandHandler : IRequestHandler<CreateTicketCommand, R
         };
 
         await _repository.AddAsync(ticket);
-        await _repository.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
         return Result<Guid>.Created(ticket.Id);
     }

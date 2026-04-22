@@ -8,10 +8,12 @@ namespace TaskBoard.Application.Commands.Tickets;
 public class DeleteTicketCommandHandler : IRequestHandler<DeleteTicketCommand, Result<Unit>>
 {
     private readonly IRepository<Ticket> _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteTicketCommandHandler(IRepository<Ticket> repository)
+    public DeleteTicketCommandHandler(IRepository<Ticket> repository, IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<Unit>> Handle(DeleteTicketCommand request, CancellationToken cancellationToken)
@@ -22,7 +24,7 @@ public class DeleteTicketCommandHandler : IRequestHandler<DeleteTicketCommand, R
             return Result<Unit>.Fail($"Ticket with id {request.Id} not found", 404);
 
         _repository.Delete(ticket);
-        await _repository.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
         return Result<Unit>.NoContent();
     }

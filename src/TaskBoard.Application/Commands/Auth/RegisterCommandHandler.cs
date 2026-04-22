@@ -9,10 +9,12 @@ namespace TaskBoard.Application.Commands.Auth;
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<Guid>>
 {
     private readonly IRepository<User> _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public RegisterCommandHandler(IRepository<User> repository)
+    public RegisterCommandHandler(IRepository<User> repository, IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<Guid>> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -30,7 +32,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<Gu
         };
 
         await _repository.AddAsync(user);
-        await _repository.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
         
         return Result<Guid>.Created(user.Id);
     }

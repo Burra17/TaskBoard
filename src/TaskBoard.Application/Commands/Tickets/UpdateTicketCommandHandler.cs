@@ -11,11 +11,13 @@ public class UpdateTicketCommandHandler : IRequestHandler<UpdateTicketCommand, R
 {
     private readonly IRepository<Ticket> _repository;
     private readonly IMapper _mapper;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateTicketCommandHandler(IRepository<Ticket> repository, IMapper mapper)
+    public UpdateTicketCommandHandler(IRepository<Ticket> repository, IMapper mapper, IUnitOfWork unitOfWork)
     {
         _repository = repository;
         _mapper = mapper;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<TicketDto>> Handle(UpdateTicketCommand request, CancellationToken cancellationToken)
@@ -32,7 +34,7 @@ public class UpdateTicketCommandHandler : IRequestHandler<UpdateTicketCommand, R
         ticket.UpdatedAt = DateTime.UtcNow;
 
         _repository.Update(ticket);
-        await _repository.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
         var ticketDto = _mapper.Map<TicketDto>(ticket);
 
