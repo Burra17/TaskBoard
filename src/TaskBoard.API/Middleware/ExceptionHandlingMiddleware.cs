@@ -29,18 +29,6 @@ public class ExceptionHandlingMiddleware
 
             await context.Response.WriteAsJsonAsync(new { errors });
         }
-        catch (KeyNotFoundException ex)
-        {
-            context.Response.StatusCode = 404;
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new { error = ex.Message });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            context.Response.StatusCode = 401;
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new { error = ex.Message });
-        }
         catch (Exception)
         {
             context.Response.StatusCode = 500;

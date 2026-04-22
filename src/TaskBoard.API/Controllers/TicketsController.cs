@@ -9,7 +9,7 @@ namespace TaskBoard.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TicketsController : ControllerBase
+public class TicketsController : ApiController
 {
     private readonly IMediator _mediator;
 
@@ -24,7 +24,7 @@ public class TicketsController : ControllerBase
     public async Task<IActionResult> CreateTicket(CreateTicketCommand command)
     {
         var result = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetTicketById), new { id = result }, result);
+        return HandleResult(result);
     }
 
     // GET api/tickets
@@ -33,7 +33,7 @@ public class TicketsController : ControllerBase
     public async Task<IActionResult> GetAllTickets()
     {
         var result = await _mediator.Send(new GetAllTicketsQuery());
-        return Ok(result);
+        return HandleResult(result);
     }
 
     // GET api/ticket/{id}
@@ -43,10 +43,7 @@ public class TicketsController : ControllerBase
     {
         var result = await _mediator.Send(new GetTicketByIdQuery(id));
 
-        if (result == null)
-            return NotFound();
-
-        return Ok(result);
+        return HandleResult(result);
     }
 
     // PUT api/ticket/{id}
@@ -57,7 +54,7 @@ public class TicketsController : ControllerBase
         // Combine URL id with request body into a command
         var command = new UpdateTicketCommand(id, dto.Title, dto.Description, dto.Priority, dto.Status);
         var result = await _mediator.Send(command);
-        return Ok(result);
+        return HandleResult(result);
     }
 
     // DELETE api/ticket/{id}
@@ -65,7 +62,7 @@ public class TicketsController : ControllerBase
     [Authorize (Roles = "Admin")]
     public async Task<IActionResult> DeleteTicket(Guid id)
     {
-        await _mediator.Send(new DeleteTicketCommand(id));
-        return NoContent();
+        var result = await _mediator.Send(new DeleteTicketCommand(id));
+        return HandleResult(result);
     }
 }

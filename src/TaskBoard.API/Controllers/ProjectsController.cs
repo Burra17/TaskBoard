@@ -8,7 +8,7 @@ namespace TaskBoard.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProjectsController : ControllerBase
+public class ProjectsController : ApiController
 {
     private readonly IMediator _mediator;
 
@@ -23,7 +23,7 @@ public class ProjectsController : ControllerBase
     public async Task<IActionResult> CreateProject(CreateProjectCommand command)
     {
         var result = await _mediator.Send(command);
-        return StatusCode(StatusCodes.Status201Created, result);
+        return HandleResult(result);
     }
 
     // GET api/projects
@@ -32,6 +32,6 @@ public class ProjectsController : ControllerBase
     public async Task<IActionResult> GetAllProjects()
     {
         var result = await _mediator.Send(new GetAllProjectsQuery());
-        return Ok(result);
+        return HandleResult(result);
     }
 }

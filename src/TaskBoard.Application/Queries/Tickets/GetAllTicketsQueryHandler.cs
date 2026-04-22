@@ -2,11 +2,12 @@
 using MediatR;
 using TaskBoard.Application.DTOs;
 using TaskBoard.Application.Interfaces;
+using TaskBoard.Domain.Common;
 using TaskBoard.Domain.Models;
 
 namespace TaskBoard.Application.Queries.Tickets;
 
-public class GetAllTicketsQueryHandler : IRequestHandler<GetAllTicketsQuery, IEnumerable<TicketDto>>
+public class GetAllTicketsQueryHandler : IRequestHandler<GetAllTicketsQuery, Result<IEnumerable<TicketDto>>>
 {
     private readonly IRepository<Ticket> _repository;
     private readonly IMapper _mapper;
@@ -17,9 +18,10 @@ public class GetAllTicketsQueryHandler : IRequestHandler<GetAllTicketsQuery, IEn
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<TicketDto>> Handle(GetAllTicketsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<TicketDto>>> Handle(GetAllTicketsQuery request, CancellationToken cancellationToken)
     {
-        // Fetch all tickets and map to DTOs
-        return _mapper.Map<IEnumerable<TicketDto>>(await _repository.GetAllAsync());
+        var ticketDtos = _mapper.Map<IEnumerable<TicketDto>>(await _repository.GetAllAsync());
+
+        return Result<IEnumerable<TicketDto>>.Ok(ticketDtos);
     }
 }

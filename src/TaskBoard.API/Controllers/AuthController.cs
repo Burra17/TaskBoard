@@ -6,7 +6,7 @@ namespace TaskBoard.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController : ControllerBase
+public class AuthController : ApiController
 {
     private readonly IMediator _mediator;
 
@@ -20,14 +20,18 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Register(RegisterCommand command)
     {
         var result = await _mediator.Send(command);
-        return Ok(result);
+        return HandleResult(result);
     }
 
     // POST api/auth/login
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginCommand command)
     {
-        var token = await _mediator.Send(command);
-        return Ok(new { token });
+        var result = await _mediator.Send(command);
+
+        if (result.IsSuccess)
+            return Ok(new { token = result.Value });
+
+        return HandleResult(result);
     }
 }
