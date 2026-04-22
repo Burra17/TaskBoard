@@ -2,11 +2,12 @@
 using MediatR;
 using TaskBoard.Application.DTOs;
 using TaskBoard.Application.Interfaces;
+using TaskBoard.Domain.Common;
 using TaskBoard.Domain.Models;
 
 namespace TaskBoard.Application.Queries.Projects;
 
-public class GetAllProjectsQueryHandler : IRequestHandler<GetAllProjectsQuery, IEnumerable<ProjectDto>>
+public class GetAllProjectsQueryHandler : IRequestHandler<GetAllProjectsQuery, Result<IEnumerable<ProjectDto>>>
 {
     private readonly IRepository<Project> _repository;
     private readonly IMapper _mapper;
@@ -17,9 +18,10 @@ public class GetAllProjectsQueryHandler : IRequestHandler<GetAllProjectsQuery, I
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<ProjectDto>> Handle(GetAllProjectsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<ProjectDto>>> Handle(GetAllProjectsQuery request, CancellationToken cancellationToken)
     {
-        // Fetch all tickets and map to DTOs
-        return _mapper.Map<IEnumerable<ProjectDto>>(await _repository.GetAllAsync());
+        var projects = _mapper.Map<IEnumerable<ProjectDto>>(await _repository.GetAllAsync());
+
+        return Result<IEnumerable<ProjectDto>>.Ok(projects);
     }
 }

@@ -1,11 +1,12 @@
 ﻿using MediatR;
 using TaskBoard.Application.Interfaces;
+using TaskBoard.Domain.Common;
 using TaskBoard.Domain.Enums;
 using TaskBoard.Domain.Models;
 
 namespace TaskBoard.Application.Commands.Auth;
 
-public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Guid>
+public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<Guid>>
 {
     private readonly IRepository<User> _repository;
 
@@ -14,8 +15,12 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Guid>
         _repository = repository;
     }
 
-    public async Task<Guid> Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
+        var users = await _repository.GetAllAsync();
+        if (users.Any(u => u.UserName == request.UserName))
+            return Result<Guid>.Fail("Username already exists", 400);
+
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -27,6 +32,6 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Guid>
         await _repository.AddAsync(user);
         await _repository.SaveChangesAsync();
         
-        return user.Id;
+        return Result<Guid>.Created(user.Id);
     }
 }

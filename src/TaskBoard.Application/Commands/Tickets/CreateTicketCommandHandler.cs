@@ -1,11 +1,12 @@
 ﻿using MediatR;
 using TaskBoard.Application.Interfaces;
+using TaskBoard.Domain.Common;
 using TaskBoard.Domain.Enums;
 using TaskBoard.Domain.Models;
 
 namespace TaskBoard.Application.Commands.Tickets;
 
-public class CreateTicketCommandHandler : IRequestHandler<CreateTicketCommand, Guid>
+public class CreateTicketCommandHandler : IRequestHandler<CreateTicketCommand, Result<Guid>>
 {
     private readonly IRepository<Ticket> _repository;
 
@@ -15,7 +16,7 @@ public class CreateTicketCommandHandler : IRequestHandler<CreateTicketCommand, G
     }
 
     // Creates a new Ticket and returns its Id
-    public async Task<Guid> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
     {
         var ticket = new Ticket
         {
@@ -30,6 +31,6 @@ public class CreateTicketCommandHandler : IRequestHandler<CreateTicketCommand, G
         await _repository.AddAsync(ticket);
         await _repository.SaveChangesAsync();
 
-        return ticket.Id;
+        return Result<Guid>.Created(ticket.Id);
     }
 }

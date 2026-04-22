@@ -5,11 +5,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TaskBoard.Application.Interfaces;
+using TaskBoard.Domain.Common;
 using TaskBoard.Domain.Models;
 
 namespace TaskBoard.Application.Commands.Auth;
 
-public class LoginCommandHandler : IRequestHandler<LoginCommand, string>
+public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<string>>
 {
     private readonly IRepository<User> _repository;
     private readonly IConfiguration _configuration;
@@ -20,7 +21,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, string>
         _configuration = configuration;
     }
 
-    public async Task<string> Handle(LoginCommand request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         // Find user by username
         var users = await _repository.GetAllAsync();
@@ -28,7 +29,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, string>
 
         // Verify password
         if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-            throw new UnauthorizedAccessException("Invalid username or password.");
+            return Result<string>.Fail($"Invalid Username or Password", 401);
 
         // Create JWT claims
         var claims = new[]
@@ -50,6 +51,8 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, string>
             signingCredentials: credentials
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var stringToken = new JwtSecurityTokenHandler().WriteToken(token);
+
+        return Result<string>.Ok(stringToken);
     }
 }
