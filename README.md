@@ -12,6 +12,8 @@ A Clean Architecture ASP.NET Core Web API for managing projects and tickets on a
 - **Serilog** with a MediatR `LoggingBehavior` pipeline
 - **JWT Bearer** authentication (`System.IdentityModel.Tokens.Jwt`)
 - **BCrypt.Net-Next** for password hashing
+- **ASP.NET Core Rate Limiting** (fixed window) on the login endpoint
+- **AspNetCore.HealthChecks.SqlServer** exposed at `/health`
 - **Scalar** (OpenAPI) for API documentation
 - Postman collection included under `docs/`
 
@@ -51,11 +53,13 @@ TaskBoard/
 │   │   │   ├── Auth/        (Register, Login)
 │   │   │   ├── Projects/    (CreateProject)
 │   │   │   └── Tickets/     (Create, Update, Delete)
+│   │   ├── Common/
+│   │   │   └── Pagination/  (PagedResult, PaginationParams)
 │   │   ├── Queries/
 │   │   │   ├── Projects/    (GetAllProjects)
 │   │   │   └── Tickets/     (GetAllTickets, GetTicketById)
 │   │   ├── DTOs/
-│   │   ├── Interfaces/IRepository.cs
+│   │   ├── Interfaces/      (IRepository, IUnitOfWork)
 │   │   ├── Mappings/        (AutoMapper profiles)
 │   │   └── DependencyInjection.cs
 │   ├── TaskBoard.Domain/
@@ -87,6 +91,10 @@ Relationships:
 
 - **CQRS + MediatR** — every controller action dispatches a Command or Query through `IMediator`. Write and read paths are separated under `Application/Commands` and `Application/Queries`.
 - **Repository Pattern** — generic `IRepository<T>` defined in `Application/Interfaces`, implemented in `Infrastructure/Repositories/Repository.cs` against EF Core.
+- **Unit of Work** — `IUnitOfWork` exposes a single `SaveChangesAsync`; registered against `AppDbContext` so all handlers share one transactional scope per request.
+- **Pagination** — `GET /api/tickets` accepts `PaginationParams` (`PageNumber`, `PageSize`, capped at 20) and returns `PagedResult<TicketDto>` with `Items`, `PageNumber`, `PageSize`, `TotalCount`, and `TotalPages`.
+- **Rate Limiting** — fixed-window limiter (10 requests/minute) applied to `POST /api/auth/login` via `[EnableRateLimiting("fixed")]`; rejections return `429 Too Many Requests`.
+- **Health Checks** — `GET /health` reports the SQL Server connection status using `AspNetCore.HealthChecks.SqlServer` and a UI-formatted JSON response.
 - **AutoMapper** — entities never leak out of the API; handlers map to `ProjectDto` / `TicketDto` before returning.
 - **Pipeline Behaviors** — `LoggingBehavior<TRequest, TResponse>` logs every request, its outcome, and elapsed time; `ValidationBehavior<TRequest, TResponse>` runs all registered FluentValidation validators before a handler executes. Validation failures throw `ValidationException`, which is translated to a 400 by `ExceptionHandlingMiddleware`.
 - **Result Pattern** — handlers return `Result<T>` (from `Domain/Common`) with `Ok`, `Fail`, `Created`, and `NoContent` factory methods instead of throwing for expected error paths. The `ApiController` base class maps results to the correct HTTP status via `HandleResult`.
@@ -143,17 +151,18 @@ Scalar API reference is then available at `/scalar/v1` in development.
 
 ## API Endpoints
 
-| Method | Route                   | Auth              | Description                   |
-|--------|-------------------------|-------------------|-------------------------------|
-| POST   | `/api/auth/register`    | Public            | Register a new user (Member)  |
-| POST   | `/api/auth/login`       | Public            | Log in and receive a JWT      |
-| POST   | `/api/projects`         | `Admin`           | Create a project              |
-| GET    | `/api/projects`         | Authenticated     | List all projects             |
-| POST   | `/api/tickets`          | Authenticated     | Create a ticket               |
-| GET    | `/api/tickets`          | Authenticated     | List all tickets              |
-| GET    | `/api/tickets/{id}`     | Authenticated     | Get a ticket by id            |
-| PUT    | `/api/tickets/{id}`     | Authenticated     | Update a ticket               |
-| DELETE | `/api/tickets/{id}`     | `Admin`           | Delete a ticket               |
+| Method | Route                   | Auth              | Description                                           |
+|--------|-------------------------|-------------------|-------------------------------------------------------|
+| POST   | `/api/auth/register`    | Public            | Register a new user (Member)                          |
+| POST   | `/api/auth/login`       | Public            | Log in and receive a JWT (rate-limited, 10/min)       |
+| POST   | `/api/projects`         | `Admin`           | Create a project                                      |
+| GET    | `/api/projects`         | Authenticated     | List all projects                                     |
+| POST   | `/api/tickets`          | Authenticated     | Create a ticket                                       |
+| GET    | `/api/tickets`          | Authenticated     | List tickets (paged — `?PageNumber=&PageSize=`)       |
+| GET    | `/api/tickets/{id}`     | Authenticated     | Get a ticket by id                                    |
+| PUT    | `/api/tickets/{id}`     | Authenticated     | Update a ticket                                       |
+| DELETE | `/api/tickets/{id}`     | `Admin`           | Delete a ticket                                       |
+| GET    | `/health`               | Public            | SQL Server health check (UI-formatted JSON)           |
 
 Send the JWT as `Authorization: Bearer <token>` on protected endpoints.
 
