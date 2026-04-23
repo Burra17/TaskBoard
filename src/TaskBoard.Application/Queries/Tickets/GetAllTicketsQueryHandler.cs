@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using TaskBoard.Application.Common.Pagination;
 using TaskBoard.Application.DTOs;
 using TaskBoard.Application.Interfaces;
 using TaskBoard.Domain.Common;
@@ -7,7 +8,7 @@ using TaskBoard.Domain.Models;
 
 namespace TaskBoard.Application.Queries.Tickets;
 
-public class GetAllTicketsQueryHandler : IRequestHandler<GetAllTicketsQuery, Result<IEnumerable<TicketDto>>>
+public class GetAllTicketsQueryHandler : IRequestHandler<GetAllTicketsQuery, Result<PagedResult<TicketDto>>>
 {
     private readonly IRepository<Ticket> _repository;
     private readonly IMapper _mapper;
@@ -18,10 +19,20 @@ public class GetAllTicketsQueryHandler : IRequestHandler<GetAllTicketsQuery, Res
         _mapper = mapper;
     }
 
-    public async Task<Result<IEnumerable<TicketDto>>> Handle(GetAllTicketsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PagedResult<TicketDto>>> Handle(GetAllTicketsQuery request, CancellationToken cancellationToken)
     {
-        var ticketDtos = _mapper.Map<IEnumerable<TicketDto>>(await _repository.GetAllAsync());
+        var pagedResult = await _repository.GetPagedAsync(request.PaginationParams.PageNumber, request.PaginationParams.PageSize);
 
-        return Result<IEnumerable<TicketDto>>.Ok(ticketDtos);
+        var ticketDtos = _mapper.Map<IEnumerable<TicketDto>>(pagedResult.Items);
+
+        var pagedResultDto = new PagedResult<TicketDto>
+        (
+            ticketDtos,
+            pagedResult.TotalCount,
+            request.PaginationParams.PageNumber,
+            request.PaginationParams.PageSize
+        );
+
+        return Result<PagedResult<TicketDto>>.Ok(pagedResultDto);
     }
 }

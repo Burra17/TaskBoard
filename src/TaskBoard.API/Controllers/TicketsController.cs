@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskBoard.Application.Commands.Tickets;
+using TaskBoard.Application.Common.Pagination;
 using TaskBoard.Application.DTOs;
 using TaskBoard.Application.Queries.Tickets;
 
@@ -30,9 +31,9 @@ public class TicketsController : ApiController
     // GET api/tickets
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> GetAllTickets()
+    public async Task<IActionResult> GetAllTickets([FromQuery] PaginationParams paginationParams)
     {
-        var result = await _mediator.Send(new GetAllTicketsQuery());
+        var result = await _mediator.Send(new GetAllTicketsQuery(paginationParams));
         return HandleResult(result);
     }
 

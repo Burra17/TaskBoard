@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TaskBoard.Application.Common.Pagination;
 using TaskBoard.Application.Interfaces;
 using TaskBoard.Infrastructure.Database;
 
@@ -40,5 +41,20 @@ public class Repository<T> : IRepository<T> where T : class
     public void Update(T entity)
     {
         _dbSet.Update(entity);
+    }
+
+    public async Task<(IEnumerable<T> Items, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize)
+    {
+        var query = _dbSet.AsNoTracking();
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderBy(x => EF.Property<Guid>(x, "Id"))
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
     }
 }
