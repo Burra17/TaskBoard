@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using TaskBoard.Application.Commands.Auth;
 
 namespace TaskBoard.API.Controllers;
@@ -25,6 +26,7 @@ public class AuthController : ApiController
 
     // POST api/auth/login
     [HttpPost("login")]
+    [EnableRateLimiting("fixed")]
     public async Task<IActionResult> Login(LoginCommand command)
     {
         var result = await _mediator.Send(command);
