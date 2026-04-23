@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,6 +46,17 @@ public static class DependencyInjection
         // Health checks
         services.AddHealthChecks()
             .AddSqlServer(configuration.GetConnectionString("DefaultConnection")!);
+
+        // Rate limiting
+        services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = 429; // Too Many Requests
+            options.AddFixedWindowLimiter("fixed", opt =>
+            {
+                opt.Window = TimeSpan.FromMinutes(1);
+                opt.PermitLimit = 10;
+            });
+        });
 
         return services;
     }
