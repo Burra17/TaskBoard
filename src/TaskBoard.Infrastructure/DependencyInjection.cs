@@ -41,6 +41,10 @@ public static class DependencyInjection
             };
         });
 
+        // Health checks
+        services.AddHealthChecks()
+            .AddSqlServer(configuration.GetConnectionString("DefaultConnection")!);
+
         return services;
     }
 }
